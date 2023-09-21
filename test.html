@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Photo Snap App</title>
+</head>
+<body>
+    <h1>Photo Snap App</h1>
+    <video id="camera-feed" autoplay></video>
+    <button id="snap-button">Take Photo</button>
+    <button id="download-button">Download </button>
+    <canvas id="photo-canvas" style="display: none;"></canvas>
+    <img id="captured-photo" alt="Captured Photo">
+    <script>
+ const video = document.getElementById('camera-feed');
+const snapButton = document.getElementById('snap-button');
+const photoCanvas = document.getElementById('photo-canvas');
+const capturedPhoto = document.getElementById('captured-photo');
+const downloadButton = document.getElementById('download-button');
+
+// Check if the user's browser supports getUserMedia
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    // Request access to the user's camera
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function (stream) {
+            // Display the camera feed in the video element
+            video.srcObject = stream;
+        })
+        .catch(function (error) {
+            console.error('Error accessing camera:', error);
+        });
+} else {
+    console.error('getUserMedia not supported in this browser');
+}
+
+// Function to take a photo and enable the download button
+snapButton.addEventListener('click', function () {
+    const context = photoCanvas.getContext('2d');
+    context.drawImage(video, 0, 0, photoCanvas.width, photoCanvas.height);
+
+    // Show the captured photo
+    capturedPhoto.src = photoCanvas.toDataURL('image/png');
+    capturedPhoto.style.width = '100%'; // Set width to cover the screen
+    capturedPhoto.style.height = '50vh'; // Set height to half the screen
+    capturedPhoto.style.display = 'block';
+
+    // Enable the download button
+    downloadButton.style.display = 'block';
+});
+
+// Function to download the captured photo
+downloadButton.addEventListener('click', function () {
+    const photoDataURL = capturedPhoto.src;
+    const a = document.createElement('a');
+    a.href = photoDataURL;
+    a.download = 'captured_photo.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+});
+    </script>
+</body>
+</html>
